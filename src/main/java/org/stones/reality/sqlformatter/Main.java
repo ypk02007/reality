@@ -8,6 +8,9 @@ public class Main {
 		FormatOptions option = FormatOptions.getInstance();
 		option.setDefaultOptions();
 		
+		option.setTableNameCase(FormatOptions.UPPERCASE);
+		option.setcolumnNameCase(FormatOptions.INITCAP);
+		
 		result = bf.beautifier(sql);
 		System.out.println(result);
 	}
