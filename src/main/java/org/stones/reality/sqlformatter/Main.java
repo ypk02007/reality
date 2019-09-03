@@ -8,15 +8,7 @@ public class Main {
 		FormatOptions option = FormatOptions.getInstance();
 		option.setDefaultOptions();
 		
-		//option.setStyle(FormatOptions.STYLE_TWO);
-		//option.setStackAlign(FormatOptions.ALIGN_RIGHT);
-		//option.setLinebreakWithComma(FormatOptions.BEFORE_WITH_SPACE);
-		//option.setLinebreakWithComma(FormatOptions.BEFORE);
-		
 		result = bf.beautifier(sql);
 		System.out.println(result);
-		System.out.println("LBWC: " + option.getLinebreakWithComma());
-		System.out.println("Style: " + option.getStyle());
-		System.out.println("Align: " + option.getStackAlign());
 	}
 }

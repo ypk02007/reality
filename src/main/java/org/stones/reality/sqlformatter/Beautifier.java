@@ -13,7 +13,6 @@ public class Beautifier {
 	}
 	
 	public String beautifier(String sql) {
-		//this.option = option;
 		String result = insertIndentation(inlineBlock(insertNewLine(insertTokenPriority(changeTokenCase(insertTokenType(tokenization(sql)))))));
 		return result;
 	}
