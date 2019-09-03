@@ -172,6 +172,7 @@ public class Beautifier {
 		int paraDepth = 0;
 		boolean andOrFlag = false;
 		boolean closingParaFlag = false;
+		boolean paraDepthFlag = false;
 		String str = null;
 		String type = null;
 		
@@ -186,6 +187,8 @@ public class Beautifier {
 				if(keywordPriorityCheck(str) == 0) {
 					priority = currentPriority + keywordPriorityCheck(str);
 					indentationCheck(str);
+					if(str.toLowerCase().equals("select"))
+						paraDepth++;
 				} else if(andOrFlag) {
 					andOrFlag = false;
 					keywordWeak++;
@@ -199,7 +202,7 @@ public class Beautifier {
 			case "openingParanthesesKeywordStrong":
 				currentPriority++;
 				priority = currentPriority;
-				paraDepth++;
+				paraDepthFlag = true;
 				break;
 			case "openingParanthesesKeywordWeak":
 				andOrFlag = true;

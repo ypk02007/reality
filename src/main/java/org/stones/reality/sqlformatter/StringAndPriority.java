@@ -32,17 +32,17 @@ public class StringAndPriority {
 		}
 	}
 	public void addSomeSpaceInParantheses(int paraDepth) {
-		String paranthesesSpace = "";
+		String paranthesesSpace = " ";
 		if(option.getLinebreakWithComma() == FormatOptions.BEFORE)
-			paranthesesSpace = " ";
-		else if(option.getLinebreakWithComma() == FormatOptions.BEFORE_WITH_SPACE)
 			paranthesesSpace = "  ";
+		else if(option.getLinebreakWithComma() == FormatOptions.BEFORE_WITH_SPACE)
+			paranthesesSpace = "   ";
 		for(int i = 0; i < paraDepth; i++)
 			str = paranthesesSpace + str;
 	}
 	public void addIndentation() {
 		str = indentation + str;
-		if(priority > 1)
-			indentation += " ";
+		//if(priority > 1)
+			//indentation += " ";
 	}
 }
