@@ -13,7 +13,6 @@ public class Beautifier {
 	}
 	
 	public String beautifier(String sql) {
-		//this.option = option;
 		String result = insertIndentation(inlineBlock(insertNewLine(insertTokenPriority(changeTokenCase(insertTokenType(tokenization(sql)))))));
 		return result;
 	}
@@ -88,7 +87,7 @@ public class Beautifier {
 				type = "function";
 			else if((tokens.get(i+1).equals(".") || tokens.get(i-1).equals(")") || type.equals("tableName")) && !keywordCheck(str) && !specialCharacterCheck(str))
 				type = "alias";
-			else if(tokens.get(i-1).equals(".") || (!keywordFromFlag && (type.equals("keyword") && tokens.get(i+1).equals(",")) || (tokens.get(i-1).equals(",") && tokens.get(i+1).equals(",")) || keywordPriorityCheck(tokens.get(i+1)) == 0))
+			else if(tokens.get(i-1).equals(".") || (!keywordFromFlag && ((type.equals("keyword") && (tokens.get(i+1).equals(",") || otherTypeCheck(tokens.get(i+1)))) || (tokens.get(i-1).equals(",") && tokens.get(i+1).equals(",")) || keywordPriorityCheck(tokens.get(i+1)) == 0)))
 				type = "columnName";
 			else if(otherTypeCheck(str))
 				type = "other";
@@ -169,33 +168,40 @@ public class Beautifier {
 		int currentPriority = 0;
 		int priority = 0;
 		int keywordWeak = 0;
+		int paraDepth = 0;
 		boolean andOrFlag = false;
 		boolean closingParaFlag = false;
+		boolean paraDepthFlag = false;
+		String str = null;
 		String type = null;
 		
 		indentationCheck(tokens.get(0).getString());
 		tokensWithPriority.add(new StringAndPriority(tokens.get(0).getString(), priority)); // 첫 토큰은 반드시 keyword
 		
 		for(int i = 1; i < tokens.size(); i++) {
+			str = tokens.get(i).getString();
 			type = tokens.get(i).getType();
 			switch(type) {
 			case "keyword":
-				if(keywordPriorityCheck(tokens.get(i).getString()) == 0) {
-					priority = currentPriority + keywordPriorityCheck(tokens.get(i).getString());
-					indentationCheck(tokens.get(i).getString());
+				if(keywordPriorityCheck(str) == 0) {
+					priority = currentPriority + keywordPriorityCheck(str);
+					indentationCheck(str);
+					if(str.toLowerCase().equals("select"))
+						paraDepth++;
 				} else if(andOrFlag) {
 					andOrFlag = false;
 					keywordWeak++;
-					priority = currentPriority + keywordPriorityCheck(tokens.get(i).getString()) + keywordWeak;
+					priority = currentPriority + keywordPriorityCheck(str) + keywordWeak;
 				} else if(closingParaFlag) {
 					closingParaFlag = false;
 					keywordWeak = 0;
-					priority = currentPriority + keywordPriorityCheck(tokens.get(i).getString()) + keywordWeak;
+					priority = currentPriority + keywordPriorityCheck(str) + keywordWeak;
 				}
 				break;
 			case "openingParanthesesKeywordStrong":
 				currentPriority++;
 				priority = currentPriority;
+				paraDepthFlag = true;
 				break;
 			case "openingParanthesesKeywordWeak":
 				andOrFlag = true;
@@ -204,6 +210,7 @@ public class Beautifier {
 			case "closingParanthesesKeywordStrong":
 				priority = currentPriority;
 				currentPriority--;
+				paraDepth--;
 				break;
 			case "closingParanthesesKeywordWeak":
 				priority = currentPriority + 1 + keywordWeak;
@@ -217,7 +224,8 @@ public class Beautifier {
 				}
 				priority = currentPriority + 1 + keywordWeak;
 			}
-			tokensWithPriority.add(new StringAndPriority(tokens.get(i).getString(), priority));
+			tokensWithPriority.add(new StringAndPriority(str, priority));
+			tokensWithPriority.get(i).setParaDepth(paraDepth);
 		}
 		
 		for(int i = 0; i < tokensWithPriority.size(); i++) { // 형식 맞추기 위한 스페이스 추가
@@ -232,20 +240,25 @@ public class Beautifier {
 		Vector<StringAndPriority> inlinedTokens = new Vector<StringAndPriority>();
 		StringBuilder temp = new StringBuilder(""); // 버퍼역할
 		int priorityTemp = 0;
+		int paraDepthTemp = 0;
+		String str = null;
 		for(int i = 0; i < tokensWithPriority.size() - 1; i++) {
-			String tokenString = tokensWithPriority.get(i).getString();
+			str = tokensWithPriority.get(i).getString();
 			
-			temp.append(tokenString); // 개행문자가 나오기 전 까지 저장
+			temp.append(str); // 개행문자가 나오기 전 까지 저장
 			if(temp.charAt(temp.length() - 1) == '\n') {
-				inlinedTokens.add(new StringAndPriority(temp.toString(), priorityTemp));
+				StringAndPriority sap = new StringAndPriority(temp.toString(), priorityTemp);
+				sap.addSomeSpaceInParantheses(paraDepthTemp);
+				inlinedTokens.add(sap);
 				temp = new StringBuilder("");
 				priorityTemp = tokensWithPriority.get(i+1).getPriority();
+				paraDepthTemp = tokensWithPriority.get(i+1).getParaDepth();
 			} else if(addSpaceCheck(tokensWithPriority.get(i), tokensWithPriority.get(i+1)))
 				temp.append(" ");
 		}
 		// index예외 방지를 위해 마지막 요소를 반복문 밖에서 처리
-		String tokenString = tokensWithPriority.get(tokensWithPriority.size() - 1).getString();
-		temp.append(tokenString);
+		str = tokensWithPriority.get(tokensWithPriority.size() - 1).getString();
+		temp.append(str);
 		inlinedTokens.add(new StringAndPriority(temp.toString(), priorityTemp));
 		
 		return inlinedTokens;
@@ -372,4 +385,3 @@ public class Beautifier {
 		return keywords;
 	}
 }
-
