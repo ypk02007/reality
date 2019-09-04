@@ -13,8 +13,31 @@ public class Beautifier {
 	}
 	
 	public String beautifier(String sql) {
-		String result = insertIndentation(inlineBlock(insertNewLine(insertTokenPriority(changeTokenCase(insertTokenType(tokenization(sql)))))));
-		return result;
+		/*
+		 * 작업 순서
+		 * 1. tokenization(): 입력받은 sql문을 스페이스 한 칸을 기준으로 잘라 여러 토큰으로 만든다. 한 토큰을 세분화하기도 한다.
+		 * 2. insertTokenType(): 토큰들의 특징을 분석해 어떤 토큰인지 타입을 저장한다.
+		 * 3. changeTokenCase(): 토큰들의 타입, 옵션에 따라 대소문자 변경 작업을 해준다.
+		 * 4. insertTokenPriority(): 토큰들의 타입, 순서 등의 여러 요인을 분석하여 우선순위를 저장한다. 우선순위는 텍스트 출력 형식(특히 들여쓰기)을 정하는데 사용된다.
+		 * 5. insertNewLine(): 토큰들 중 조건에 맞는 토큰들에게 개행문자('\n')를 추가한다. 조건은 옵션에 따라 달라진다.
+		 * 6. inlineBlock(): 한 줄에 나타낼 토큰들을 규합한다. 개행문자가 있는 토큰 까지의 모든 토큰을 한 덩어리로 만든다.
+		 * 7. insertIndentation(): 토큰 덩어리들에 그것들의 우선순위에 따른 들여쓰기를 넣어준다.
+		 * 8. resultString(): 최종 결과를 String으로 출력한다.
+		 * 
+		 * 1 ~ 4 작업은 일종의  사전작업으로, 문자열에 큰 변화를 주지 않는다.
+		 * 5 ~ 7 작업은 출력 결과와 관련된 작업으로, 문자열에 크고 작은 변화를 준다
+		 */
+		
+		Vector<String> tokenizationResult = tokenization(sql);
+		Vector<StringAndType> insertTokenTypeResult = insertTokenType(tokenizationResult);
+		Vector<StringAndType> changeTokenCaseResult = changeTokenCase(insertTokenTypeResult);
+		Vector<StringAndPriority> insertTokenPriorityResult = insertTokenPriority(changeTokenCaseResult);
+		Vector<StringAndPriority> insertNewLineResult = insertNewLine(insertTokenPriorityResult);
+		Vector<StringAndPriority> inlineBlockResult = inlineBlock(insertNewLineResult);
+		Vector<StringAndPriority> insertIndentationResult = insertIndentation(inlineBlockResult);
+		String totalResult = resultString(insertIndentationResult);
+		
+		return totalResult;
 	}
 	
 	public Vector<String> tokenization(String sql) { // sql문 쪼개기
@@ -171,7 +194,6 @@ public class Beautifier {
 		int paraDepth = 0;
 		boolean andOrFlag = false;
 		boolean closingParaFlag = false;
-		boolean paraDepthFlag = false;
 		String str = null;
 		String type = null;
 		
@@ -201,7 +223,6 @@ public class Beautifier {
 			case "openingParanthesesKeywordStrong":
 				currentPriority++;
 				priority = currentPriority;
-				paraDepthFlag = true;
 				break;
 			case "openingParanthesesKeywordWeak":
 				andOrFlag = true;
@@ -272,11 +293,17 @@ public class Beautifier {
 		return tokensWithPriority;
 	}
 	
-	public String insertIndentation(Vector<StringAndPriority> tokensWithPriority) { // 들여쓰기 추가
-		StringBuilder result = new StringBuilder("");
+	public Vector<StringAndPriority> insertIndentation(Vector<StringAndPriority> tokensWithPriority) { // 들여쓰기 추가
 		for(int i = 0; i < tokensWithPriority.size(); i++) {
 			for(int j = 0; j < tokensWithPriority.get(i).getPriority(); j++)  // 들여쓰기
 				tokensWithPriority.get(i).addIndentation();
+		}
+		return tokensWithPriority;
+	}
+	
+	public String resultString(Vector<StringAndPriority> tokensWithPriority) {
+		StringBuilder result = new StringBuilder("");
+		for(int i = 0; i < tokensWithPriority.size(); i++) {
 			result.append(tokensWithPriority.get(i).getString());
 		}
 		return result.toString();
