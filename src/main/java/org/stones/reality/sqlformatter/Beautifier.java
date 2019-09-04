@@ -385,4 +385,3 @@ public class Beautifier {
 		return keywords;
 	}
 }
-

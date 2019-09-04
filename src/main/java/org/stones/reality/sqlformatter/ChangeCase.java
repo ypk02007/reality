@@ -45,4 +45,3 @@ public class ChangeCase {
 		return str;
 	}
 }
-
