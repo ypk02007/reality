@@ -39,10 +39,11 @@ public class Beautifier {
 		inlineBlock();
 		insertIndentation();
 		
-		return resultString();
+		return resultString().trim();
 	}
 	
 	public void tokenization(String sql) { // sql문 쪼개기
+		sql = sql.replaceAll("\r\n", ""); // 특정 문자 제거
 		String[] splitted = sql.split(" "); // 먼저 띄어쓰기 한 칸을 기준으로 쪼갬
 		ArrayList<StringToken> stringTokens = new ArrayList<StringToken>();
 		for(int i = 0; i < splitted.length; i++) {
@@ -122,12 +123,12 @@ public class Beautifier {
 			tokensWithType.add(new StringToken(str, type));
 		}
 		
-		tokensWithType = analyzeParantheses(tokensWithType);
+		tokensWithType = deepAnalyzing(tokensWithType);
 		
 		stringTokens = tokensWithType;
 	}
 	
-	public ArrayList<StringToken> analyzeParantheses(ArrayList<StringToken> tokens) { // 괄호분석
+	public ArrayList<StringToken> deepAnalyzing(ArrayList<StringToken> tokens) { // 괄호, 콤마분석
 		String str = null;
 		String strPrevious = null;
 		String strNext = null;
@@ -135,6 +136,7 @@ public class Beautifier {
 		String previous = null;
 		String next = null;
 		String parantheses = null;
+		int opfCount = 0;
 		Stack<String> strStack = new Stack<String>();
 		tokens.add(new StringToken(" ", "other"));
 		for(int i = 1; i < tokens.size() - 1; i++) {
@@ -148,6 +150,7 @@ public class Beautifier {
 				if(previous.equals("function")) {
 					parantheses = type + "Function";
 					strStack.push("Function");
+					opfCount++;
 				} else if(next.equals("keyword") && keywordPriorityCheck(strNext) == 0) {
 					parantheses = type + "KeywordStrong";
 					strStack.push("KeywordStrong");
@@ -162,6 +165,7 @@ public class Beautifier {
 				if(strStack.peek().equals("Function")) {
 					parantheses = type + "Function";
 					strStack.pop();
+					opfCount--;
 				} else if(strStack.peek().equals("KeywordStrong")) {
 					parantheses = type + "KeywordStrong";
 					strStack.pop();
@@ -171,6 +175,9 @@ public class Beautifier {
 				} else
 					parantheses = type;
 				tokens.set(i, new StringToken(str, parantheses));
+			}
+			if(type.equals("comma") && opfCount > 0) {
+				tokens.set(i, new StringToken(str, type + "Function"));
 			}
 		}
 		return tokens;
@@ -248,7 +255,7 @@ public class Beautifier {
 				}
 				priority = currentPriority + 1 + keywordWeak;
 			}
-			tokensWithPriority.add(new StringToken(str, priority));
+			tokensWithPriority.add(new StringToken(str, type, priority));
 			tokensWithPriority.get(i).setParaDepth(paraDepth);
 		}
 		
@@ -340,6 +347,7 @@ public class Beautifier {
 		case "<=": return true;
 		case ">=": return true;
 		case "<>": return true;
+		case "*": return true;
 		default: return false;
 		}
 	}
@@ -375,12 +383,23 @@ public class Beautifier {
 		// 다음 토큰이 우선도 0인 keyword면서 이번 토큰이 여는 괄호가 아닌 경우 & style two 옵션
 		if((keywordPriorityCheck(next.getString()) == 0) && !current.getString().equals("(") && (option.getStyle() == FormatOptions.STYLE_TWO)) return true;
 		// 이번 토큰이 콤마인 경우 & after 옵션
-		if((current.getString().equals(",")) && (option.getLinebreakWithComma() == FormatOptions.AFTER)) return true;
+		if((current.getType().equals("comma")) && (option.getLinebreakWithComma() == FormatOptions.AFTER)) return true;
 		// 다음 토큰이 콤마인 경우 & before 또는 before with space 옵션
-		if(next.getString().equals(",") && ((option.getLinebreakWithComma() == FormatOptions.BEFORE) || (option.getLinebreakWithComma() == FormatOptions.BEFORE_WITH_SPACE))) return true;
-		// 다음 토큰이 AND나 OR일 경우
-		if(next.getString().toLowerCase().trim().equals("and") || next.getString().toLowerCase().trim().equals("or")) return true;
+		if(next.getType().equals("comma") && ((option.getLinebreakWithComma() == FormatOptions.BEFORE) || (option.getLinebreakWithComma() == FormatOptions.BEFORE_WITH_SPACE))) return true;
+		// 다음 토큰이 특정한 키워드인 경우
+		if(newLineKeywordCheck(next.getString())) return true;
 		else return false;
+	}
+	
+	public boolean newLineKeywordCheck(String keyword) {
+		keyword = keyword.toLowerCase().trim();
+		switch(keyword) {
+		case "and": return true;
+		case "or": return true;
+		case "join": return true;
+		case "on": return true;
+		default: return false;
+		}
 	}
 	
 	public boolean addSpaceCheck(StringToken current, StringToken next) { // 스페이스 한 칸 추가 조건 체크
@@ -388,6 +407,8 @@ public class Beautifier {
 			if(current.getString().equals(")") && !(next.getString().equals(")") || next.getString().equals(")\n")))
 				return true;
 			else if(option.getLinebreakWithComma() == FormatOptions.BEFORE_WITH_SPACE && current.getString().equals(","))
+				return true;
+			else if(current.getType().equals("commaFunction"))
 				return true;
 			else return false;
 		} else if(specialCharacterCheck(next.getString())) {
@@ -407,9 +428,12 @@ public class Beautifier {
 		keywords.add(new StringToken("order", 0));
 		keywords.add(new StringToken("group", 0));
 		keywords.add(new StringToken("union", 0));
+		keywords.add(new StringToken("join", 1));
+		keywords.add(new StringToken("on", 1));
 		keywords.add(new StringToken("by", 1));
 		keywords.add(new StringToken("and", 1));
 		keywords.add(new StringToken("or", 1));
+		keywords.add(new StringToken("between", 1));
 		keywords.add(new StringToken("desc", 1));
 		keywords.add(new StringToken("as", 1));
 		

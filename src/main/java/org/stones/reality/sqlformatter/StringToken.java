@@ -6,6 +6,14 @@ public class StringToken {
 	private int priority = 0;
 	private int paraDepth = 0;
 	
+	public StringToken(String str, String type, int priority) {
+		if(str == null) this.str = "NULL STRING";
+		else this.str = str;
+		if(type == null) this.type = "NULL TYPE";
+		else this.type = type;
+		this.priority = priority;
+	}
+	
 	public StringToken(String str, int priority) {
 		if(str == null) this.str = "NULL STRING";
 		else this.str = str;

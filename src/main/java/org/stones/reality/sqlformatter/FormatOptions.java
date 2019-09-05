@@ -39,7 +39,7 @@ public class FormatOptions {
 		functionCase = INITCAP;
 		datatypeCase = UPPERCASE;
 		variableCase = LOWERCASE;
-		aliasCase = LOWERCASE;
+		aliasCase = UNCHANGED;
 		linebreakWithComma = AFTER;
 		stackAlign = ALIGN_LEFT;
 		style = STYLE_ONE;
