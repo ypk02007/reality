@@ -13,8 +13,6 @@ public class BeautifierTest {
 		
 		Beautifier bf = new Beautifier();
 		
-		FormatOptions option = FormatOptions.getInstance();
-		option.setDefaultOptions();
 		String result = bf.beautifier(sql);
 		
 		assertEquals("다르다", expected, result);

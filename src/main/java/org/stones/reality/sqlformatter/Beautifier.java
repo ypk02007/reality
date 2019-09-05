@@ -3,15 +3,17 @@ package org.stones.reality.sqlformatter;
 import java.util.*;
 
 public class Beautifier {
-	FormatOptions option = null;
-	ChangeCase changeCase = null;
-	ArrayList<StringToken> stringTokens = null;
+	private FormatOptions option = null;
+	private ChangeCase changeCase = null;
+	private ArrayList<StringToken> stringTokens = null;
 	
 	public Beautifier() {
-		changeCase = new ChangeCase();
-		option = FormatOptions.getInstance();
+		option = new FormatOptions();
+		changeCase = new ChangeCase(option);
 		stringTokens = new ArrayList<StringToken>();
 	}
+	
+	public FormatOptions getBeautifierOption() {return option;}
 	
 	public String beautifier(String sql) {
 		/*
@@ -252,7 +254,7 @@ public class Beautifier {
 		
 		for(int i = 0; i < tokensWithPriority.size(); i++) { // 형식 맞추기 위한 스페이스 추가
 			if(keywordPriorityCheck(tokensWithPriority.get(i).getString()) == 0)
-				tokensWithPriority.get(i).addSomeSpaceForKeyword();
+				tokensWithPriority.get(i).addSomeSpaceForKeyword(option);
 		}
 		
 		stringTokens = tokensWithPriority;
@@ -270,7 +272,7 @@ public class Beautifier {
 			temp.append(str); // 개행문자가 나오기 전 까지 저장
 			if(temp.charAt(temp.length() - 1) == '\n') {
 				StringToken sap = new StringToken(temp.toString(), priorityTemp);
-				sap.addSomeSpaceInParantheses(paraDepthTemp);
+				sap.addSomeSpaceInParantheses(paraDepthTemp, option);
 				inlinedTokens.add(sap);
 				temp = new StringBuilder("");
 				priorityTemp = stringTokens.get(i+1).getPriority();
@@ -296,7 +298,7 @@ public class Beautifier {
 	public void insertIndentation() { // 들여쓰기 추가
 		for(int i = 0; i < stringTokens.size(); i++) {
 			for(int j = 0; j < stringTokens.get(i).getPriority(); j++)  // 들여쓰기
-				stringTokens.get(i).addIndentation();
+				stringTokens.get(i).addIndentation(option.getIndentation());
 		}
 	}
 	
@@ -343,7 +345,7 @@ public class Beautifier {
 	}
 	
 	public boolean keywordCheck(String s) {
-		Vector<StringToken> keywords = keywordList();
+		ArrayList<StringToken> keywords = keywordList();
 		s = s.toLowerCase().trim();
 		for(int j = 0; j < keywords.size(); j++) {
 			if(s.equals(keywords.get(j).getString()))
@@ -353,7 +355,7 @@ public class Beautifier {
 	}
 	
 	public int keywordPriorityCheck(String s) {
-		Vector<StringToken> keywords = keywordList();
+		ArrayList<StringToken> keywords = keywordList();
 		s = s.toLowerCase().trim();
 		for(int i = 0; i < keywords.size(); i++) {
 			if(s.equals(keywords.get(i).getString()))
@@ -397,16 +399,19 @@ public class Beautifier {
 		else return true;
 	}
 	
-	public Vector<StringToken> keywordList() { // SQL 키워드 목록
-		Vector<StringToken> keywords = new Vector<StringToken>();
+	public ArrayList<StringToken> keywordList() { // SQL 키워드 목록
+		ArrayList<StringToken> keywords = new ArrayList<StringToken>();
 		keywords.add(new StringToken("select", 0));
 		keywords.add(new StringToken("from", 0));
 		keywords.add(new StringToken("where", 0));
 		keywords.add(new StringToken("order", 0));
+		keywords.add(new StringToken("group", 0));
+		keywords.add(new StringToken("union", 0));
 		keywords.add(new StringToken("by", 1));
 		keywords.add(new StringToken("and", 1));
 		keywords.add(new StringToken("or", 1));
 		keywords.add(new StringToken("desc", 1));
+		keywords.add(new StringToken("as", 1));
 		
 		return keywords;
 	}

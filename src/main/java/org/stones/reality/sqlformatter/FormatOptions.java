@@ -1,8 +1,6 @@
 package org.stones.reality.sqlformatter;
 
 public class FormatOptions {
-	private static FormatOptions instance = null;
-	
 	final static int UPPERCASE = 0; // 대소문자 관련
 	final static int LOWERCASE = 1;
 	final static int INITCAP = 2;
@@ -31,13 +29,7 @@ public class FormatOptions {
 	private int stackAlign = 0;
 	private int style = 0;
 	
-	private FormatOptions() {};
-	
-	public static FormatOptions getInstance() {
-		if(instance == null)
-			instance = new FormatOptions();
-		return instance;
-	}
+	public FormatOptions() {setDefaultOptions();}
 	
 	public void setDefaultOptions() {
 		setIndentation(4);

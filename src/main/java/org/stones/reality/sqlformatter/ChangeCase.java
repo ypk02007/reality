@@ -1,7 +1,11 @@
 package org.stones.reality.sqlformatter;
 
 public class ChangeCase {
-	FormatOptions option = FormatOptions.getInstance();
+	FormatOptions option = null;
+	
+	ChangeCase(FormatOptions option) {
+		this.option = option;
+	}
 	
 	private int which(String type) {
 		int which = FormatOptions.UNCHANGED;
