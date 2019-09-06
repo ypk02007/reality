@@ -35,7 +35,9 @@ public class Main {
 		
 		String result = "";
 		
-		bf.getBeautifierOption().setcolumnNameCase(FormatOptions.UPPERCASE);
+		bf.getBeautifierOption().setColumnNameCase(FormatOptions.UPPERCASE);
+		bf.getBeautifierOption().setTableNameCase(FormatOptions.INITCAP);
+		//bf.getBeautifierOption().setStyle(FormatOptions.STYLE_TWO);
 		result = bf.beautifier(sql);
 		System.out.println(result);
 		System.out.println("\n=======================================\n");

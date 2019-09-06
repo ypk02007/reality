@@ -60,5 +60,13 @@ public class StringToken {
 		for(int i = 0; i < paraDepth; i++)
 			str = paranthesesSpace + str;
 	}
+	
+	public void addSomeSpaceInParantheses(String keyword) {
+		keyword = keyword.toLowerCase().trim();
+		switch(str) {
+		case "by":
+			str = "   " + str; break;
+		}
+	}
 	public void addIndentation(String indentation) {str = indentation + str;}
 }

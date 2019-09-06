@@ -73,7 +73,7 @@ public class FormatOptions {
 	
 	public void setKeywordCase(int code) {keywordCase = validCode(code, 3);}
 	public void setTableNameCase(int code) {tableNameCase = validCode(code, 3);}
-	public void setcolumnNameCase(int code) {columnNameCase = validCode(code, 3);}
+	public void setColumnNameCase(int code) {columnNameCase = validCode(code, 3);}
 	public void setFunctionCase(int code) {functionCase = validCode(code, 3);}
 	public void setDatatypeCase(int code) {datatypeCase = validCode(code, 3);}
 	public void setVariableCase(int code) {variableCase = validCode(code, 3);}

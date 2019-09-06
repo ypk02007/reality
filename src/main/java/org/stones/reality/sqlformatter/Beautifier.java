@@ -71,22 +71,18 @@ public class Beautifier {
 	public void insertTokenType() { // 토큰의 특성 적용
 		ArrayList<StringToken> tokensWithType = new ArrayList<StringToken>();
 		String str = null;
+		String strPrevious = null;
+		String strNext = null;
 		String type = null;
 		boolean keywordFromFlag = false;
 		stringTokens.add(new StringToken(" ")); // 원활한 반복문 작업을 위해 공백 추가
-		
-		for(int i = 0; i < stringTokens.size(); i++) { // 일단 모두 소문자로
-			str = stringTokens.get(i).getString();
-			if(str.charAt(0) == '\'' && str.charAt(str.length()-1) == '\'') {
-				continue; // 값은 어떠한 경우에도 변경해서는 안 됨
-			} else
-				stringTokens.set(i, new StringToken(stringTokens.get(i).getString().toLowerCase()));
-		}
 		
 		tokensWithType.add(new StringToken(stringTokens.get(0).getString(), "keyword")); // 첫 토큰은 반드시 키워드
 		
 		for(int i = 1; i < stringTokens.size() - 1; i++) {
 			str = stringTokens.get(i).getString();
+			strPrevious = stringTokens.get(i-1).getString();
+			strNext = stringTokens.get(i+1).getString();
 			
 			if(str.charAt(0) == '\'' && str.charAt(str.length()-1) == '\'')
 				type = "value";
@@ -109,11 +105,11 @@ public class Beautifier {
 				default:
 					type = "specialCharacter";
 				}
-			} else if(stringTokens.get(i+1).getString().equals("(") && !keywordCheck(str) && !specialCharacterCheck(str))
+			} else if(strNext.equals("(") && !keywordCheck(str) && !specialCharacterCheck(str))
 				type = "function";
-			else if((stringTokens.get(i+1).getString().equals(".") || stringTokens.get(i-1).getString().equals(")") || type.equals("tableName")) && !keywordCheck(str) && !specialCharacterCheck(str))
+			else if((strNext.equals(".") || strPrevious.equals(")") || type.equals("tableName") || strPrevious.toLowerCase().equals("as")) && !keywordCheck(str) && !specialCharacterCheck(str))
 				type = "alias";
-			else if(stringTokens.get(i-1).getString().equals(".") || (!keywordFromFlag && ((type.equals("keyword") && (stringTokens.get(i+1).getString().equals(",") || otherTypeCheck(stringTokens.get(i+1).getString()))) || (stringTokens.get(i-1).getString().equals(",") && stringTokens.get(i+1).getString().equals(",")) || keywordPriorityCheck(stringTokens.get(i+1).getString()) == 0)))
+			else if(strPrevious.equals(".") || (!keywordFromFlag && ((type.equals("keyword") && (strNext.equals(",") || otherTypeCheck(strNext))) || (strPrevious.equals(",") && strNext.equals(",")) || keywordPriorityCheck(strNext) == 0)))
 				type = "columnName";
 			else if(otherTypeCheck(str))
 				type = "other";
@@ -202,7 +198,7 @@ public class Beautifier {
 		int priority = 0;
 		int keywordWeak = 0;
 		int paraDepth = 0;
-		boolean andOrFlag = false;
+		boolean newLineKeywordFlag = false;
 		boolean closingParaFlag = false;
 		String str = null;
 		String type = null;
@@ -220,13 +216,13 @@ public class Beautifier {
 					indentationCheck(str);
 					if(str.toLowerCase().equals("select"))
 						paraDepth++;
-				} else if(andOrFlag) {
-					andOrFlag = false;
-					keywordWeak++;
-					priority = currentPriority + keywordPriorityCheck(str) + keywordWeak;
 				} else if(closingParaFlag) {
 					closingParaFlag = false;
 					keywordWeak = 0;
+					priority = currentPriority + keywordPriorityCheck(str) + keywordWeak;
+				} else if(newLineKeywordFlag && newLineKeywordCheck(str)) {
+					newLineKeywordFlag = false;
+					keywordWeak++;
 					priority = currentPriority + keywordPriorityCheck(str) + keywordWeak;
 				}
 				break;
@@ -235,7 +231,7 @@ public class Beautifier {
 				priority = currentPriority;
 				break;
 			case "openingParanthesesKeywordWeak":
-				andOrFlag = true;
+				newLineKeywordFlag = true;
 				priority = currentPriority + 1 + keywordWeak;
 				break;
 			case "closingParanthesesKeywordStrong":
@@ -245,8 +241,8 @@ public class Beautifier {
 				break;
 			case "closingParanthesesKeywordWeak":
 				priority = currentPriority + 1 + keywordWeak;
-				if(!closingParaFlag)
-					closingParaFlag = true;
+				newLineKeywordFlag = false;
+				closingParaFlag = true;
 				break;
 			default:
 				if(closingParaFlag) {
@@ -296,15 +292,23 @@ public class Beautifier {
 	}
 	
 	public void insertNewLine() { // 개행문자 추가
+		boolean betweenFlag = false;
 		for(int i = 0; i < stringTokens.size() - 1; i++) { // 마지막 문자열 조각은 개행문자가 필요없음
-			if(newLineCheck(stringTokens.get(i), stringTokens.get(i+1)))
-				stringTokens.get(i).addNewLine();
+			if(stringTokens.get(i).getString().toLowerCase().equals("between"))
+				betweenFlag = true;
+			if(newLineCheck(stringTokens.get(i), stringTokens.get(i+1))) {
+				if(betweenFlag) {
+					betweenFlag = false;
+					continue;
+				} else
+					stringTokens.get(i).addNewLine();
+			}
 		}
 	}
 	
 	public void insertIndentation() { // 들여쓰기 추가
 		for(int i = 0; i < stringTokens.size(); i++) {
-			for(int j = 0; j < stringTokens.get(i).getPriority(); j++)  // 들여쓰기
+			for(int j = 0; j < stringTokens.get(i).getPriority(); j++) // 들여쓰기
 				stringTokens.get(i).addIndentation(option.getIndentation());
 		}
 	}
@@ -412,7 +416,7 @@ public class Beautifier {
 				return true;
 			else return false;
 		} else if(specialCharacterCheck(next.getString())) {
-			if(keywordCheck(current.getString()) && !next.getString().equals(";"))
+			if((keywordCheck(current.getString()) && !next.getString().equals(";")))
 				return true;
 			else return false;
 		} else if(next.getString().equals(",\n"))
