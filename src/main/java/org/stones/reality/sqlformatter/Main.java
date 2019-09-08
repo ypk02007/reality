@@ -31,7 +31,7 @@ public class Main {
 				"(abs(obj.psfMag_g - nobj.psfMag_g) < 0.5 or \r\n" + 
 				"abs(obj.psfMag_r - nobj.psfMag_r) < 0.5 or \r\n" + 
 				"abs(obj.psfMag_i - nobj.psfMag_i) < 0.5) \r\n" + 
-				"order by obj.run, obj.camCol, obj.field";
+				"order by obj.run, obj.camCol, obj.field;";
 		
 		String result = "";
 		

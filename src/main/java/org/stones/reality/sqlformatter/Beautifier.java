@@ -39,7 +39,7 @@ public class Beautifier {
 		inlineBlock();
 		insertIndentation();
 		
-		return resultString().trim();
+		return resultString();
 	}
 	
 	public void tokenization(String sql) { // sql문 쪼개기
@@ -102,6 +102,8 @@ public class Beautifier {
 					type = "semiColon"; break;
 				case ".":
 					type = "dot"; break;
+				case "*":
+					type = "asterisk"; break;
 				default:
 					type = "specialCharacter";
 				}
@@ -274,9 +276,9 @@ public class Beautifier {
 			
 			temp.append(str); // 개행문자가 나오기 전 까지 저장
 			if(temp.charAt(temp.length() - 1) == '\n') {
-				StringToken sap = new StringToken(temp.toString(), priorityTemp);
-				sap.addSomeSpaceInParantheses(paraDepthTemp, option);
-				inlinedTokens.add(sap);
+				StringToken st = new StringToken(temp.toString(), priorityTemp);
+				st.addSomeSpaceInParantheses(paraDepthTemp, option);
+				inlinedTokens.add(st);
 				temp = new StringBuilder("");
 				priorityTemp = stringTokens.get(i+1).getPriority();
 				paraDepthTemp = stringTokens.get(i+1).getParaDepth();
@@ -296,7 +298,7 @@ public class Beautifier {
 		for(int i = 0; i < stringTokens.size() - 1; i++) { // 마지막 문자열 조각은 개행문자가 필요없음
 			if(stringTokens.get(i).getString().toLowerCase().equals("between"))
 				betweenFlag = true;
-			if(newLineCheck(stringTokens.get(i), stringTokens.get(i+1))) {
+			if(newLineCheck(stringTokens.get(i), stringTokens.get(i+1))) { // BETWEEN A AND B
 				if(betweenFlag) {
 					betweenFlag = false;
 					continue;
@@ -318,7 +320,7 @@ public class Beautifier {
 		for(int i = 0; i < stringTokens.size(); i++) {
 			result.append(stringTokens.get(i).getString());
 		}
-		return result.toString();
+		return result.toString().trim();
 	}
 	
 	public boolean specialCharacterCheck(char c) { // 이하의 특수문자는 따로 분리함
@@ -328,6 +330,7 @@ public class Beautifier {
 		case ')': return true;
 		case ';': return true;
 		case '.': return true;
+		case '*': return true;
 		default: return false;
 		}
 	}
@@ -339,6 +342,7 @@ public class Beautifier {
 		case ")": return true;
 		case ";": return true;
 		case ".": return true;
+		case "*": return true;
 		default: return false;
 		}
 	}
@@ -351,7 +355,6 @@ public class Beautifier {
 		case "<=": return true;
 		case ">=": return true;
 		case "<>": return true;
-		case "*": return true;
 		default: return false;
 		}
 	}
@@ -408,18 +411,22 @@ public class Beautifier {
 	
 	public boolean addSpaceCheck(StringToken current, StringToken next) { // 스페이스 한 칸 추가 조건 체크
 		if(specialCharacterCheck(current.getString())) {
-			if(current.getString().equals(")") && !(next.getString().equals(")") || next.getString().equals(")\n")))
+			if(current.getString().equals(")") && !(next.getString().equals(")") || next.getString().equals(")\n") || next.getString().equals(",")))
 				return true;
 			else if(option.getLinebreakWithComma() == FormatOptions.BEFORE_WITH_SPACE && current.getString().equals(","))
 				return true;
 			else if(current.getType().equals("commaFunction"))
 				return true;
-			else return false;
-		} else if(specialCharacterCheck(next.getString())) {
-			if((keywordCheck(current.getString()) && !next.getString().equals(";")))
+			else if(current.getString().equals("*"))
 				return true;
 			else return false;
-		} else if(next.getString().equals(",\n"))
+		} else if(specialCharacterCheck(next.getString())) {
+			if(keywordCheck(current.getString()) && !next.getString().equals(";"))
+				return true;
+			else if(next.getString().equals("*"))
+				return true;
+			else return false;
+		} else if(next.getString().equals(",\n") || next.getString().equals(")\n"))
 			return false;
 		else return true;
 	}
