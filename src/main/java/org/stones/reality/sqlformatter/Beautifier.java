@@ -258,7 +258,7 @@ public class Beautifier {
 		}
 		
 		for(int i = 0; i < tokensWithPriority.size(); i++) { // 형식 맞추기 위한 스페이스 추가
-			if(keywordPriorityCheck(tokensWithPriority.get(i).getString()) == 0)
+			if(keywordPriorityCheck(tokensWithPriority.get(i).getString()) == 0 && !tokensWithPriority.get(i).getString().toLowerCase().equals("by"))
 				tokensWithPriority.get(i).addSomeSpaceForKeyword(option);
 		}
 		
@@ -309,9 +309,14 @@ public class Beautifier {
 	}
 	
 	public void insertIndentation() { // 들여쓰기 추가
+		boolean byFlag = false;
 		for(int i = 0; i < stringTokens.size(); i++) {
 			for(int j = 0; j < stringTokens.get(i).getPriority(); j++) // 들여쓰기
 				stringTokens.get(i).addIndentation(option.getIndentation());
+			if(byFlag && option.getStyle() == FormatOptions.STYLE_TWO)
+				stringTokens.get(i).addSomeSpaceInParantheses();
+			if(stringTokens.get(i).getString().toLowerCase().contains("by"))
+				byFlag = true;
 		}
 	}
 	
@@ -433,6 +438,9 @@ public class Beautifier {
 	
 	public ArrayList<StringToken> keywordList() { // SQL 키워드 목록
 		ArrayList<StringToken> keywords = new ArrayList<StringToken>();
+		int twoWordsKeywordPriority = 0;
+		if(option.getStyle() == FormatOptions.STYLE_TWO)
+			twoWordsKeywordPriority = 1;
 		keywords.add(new StringToken("select", 0));
 		keywords.add(new StringToken("from", 0));
 		keywords.add(new StringToken("where", 0));
@@ -441,7 +449,7 @@ public class Beautifier {
 		keywords.add(new StringToken("union", 0));
 		keywords.add(new StringToken("join", 1));
 		keywords.add(new StringToken("on", 1));
-		keywords.add(new StringToken("by", 1));
+		keywords.add(new StringToken("by", twoWordsKeywordPriority));
 		keywords.add(new StringToken("and", 1));
 		keywords.add(new StringToken("or", 1));
 		keywords.add(new StringToken("between", 1));
