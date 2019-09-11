@@ -42,7 +42,7 @@ public class Main {
 		result = bf.beautifier(sql);
 		System.out.println(result);
 		System.out.println("\n=======================================\n");
-		//bf2.getBeautifierOption().setStyle(FormatOptions.STYLE_TWO);
+		bf2.getBeautifierOption().setStyle(FormatOptions.STYLE_TWO);
 		bf2.getBeautifierOption().setStackAlign(FormatOptions.ALIGN_RIGHT);
 		result = bf2.beautifier(sql2);
 		System.out.println(result);

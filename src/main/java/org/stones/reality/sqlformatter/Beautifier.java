@@ -5,7 +5,7 @@ import java.util.*;
 public class Beautifier {
 	private FormatOptions option = null;
 	private ChangeCase changeCase = null;
-	private ArrayList<StringToken> stringTokens = null;
+	private List<StringToken> stringTokens = null;
 	
 	public Beautifier() {
 		option = new FormatOptions();
@@ -45,7 +45,7 @@ public class Beautifier {
 	public void tokenization(String sql) { // sql문 쪼개기
 		sql = sql.replaceAll("\r\n", ""); // 특정 문자 제거
 		String[] splitted = sql.split(" "); // 먼저 띄어쓰기 한 칸을 기준으로 쪼갬
-		ArrayList<StringToken> stringTokens = new ArrayList<StringToken>();
+		List<StringToken> stringTokens = new ArrayList<StringToken>();
 		for(int i = 0; i < splitted.length; i++) {
 			StringBuilder sb = new StringBuilder(splitted[i]);
 			StringBuilder temp = new StringBuilder("");
@@ -61,15 +61,16 @@ public class Beautifier {
 				} else {
 					temp.append(c);
 				}
-				if(j == len - 1 && temp.length() != 0)
+				if(j == len - 1 && temp.length() != 0) {
 					stringTokens.add(new StringToken(temp.toString()));
+				}
 			}
 		}
 		this.stringTokens = stringTokens;
 	}
 	
 	public void insertTokenType() { // 토큰의 특성 적용
-		ArrayList<StringToken> tokensWithType = new ArrayList<StringToken>();
+		List<StringToken> tokensWithType = new ArrayList<StringToken>();
 		String str = null;
 		String strPrevious = null;
 		String strNext = null;
@@ -84,9 +85,9 @@ public class Beautifier {
 			strPrevious = stringTokens.get(i-1).getString();
 			strNext = stringTokens.get(i+1).getString();
 			
-			if(str.charAt(0) == '\'' && str.charAt(str.length()-1) == '\'')
+			if(str.charAt(0) == '\'' && str.charAt(str.length()-1) == '\'') {
 				type = "value";
-			else if(keywordCheck(str)) {
+			} else if(keywordCheck(str)) {
 				type = "keyword";
 				if(str.equals("from")) keywordFromFlag = true;
 				else keywordFromFlag = false;
@@ -107,17 +108,17 @@ public class Beautifier {
 				default:
 					type = "specialCharacter";
 				}
-			} else if(strNext.equals("(") && !keywordCheck(str) && !specialCharacterCheck(str))
+			} else if(strNext.equals("(") && !keywordCheck(str) && !specialCharacterCheck(str)) {
 				type = "function";
-			else if((strNext.equals(".") || strPrevious.equals(")") || type.equals("tableName") || strPrevious.toLowerCase().equals("as")) && !keywordCheck(str) && !specialCharacterCheck(str))
+			} else if((strNext.equals(".") || strPrevious.equals(")") || type.equals("tableName") || strPrevious.toLowerCase().equals("as")) && !keywordCheck(str) && !specialCharacterCheck(str)) {
 				type = "alias";
-			else if(strPrevious.equals(".") || (!keywordFromFlag && ((type.equals("keyword") && (strNext.equals(",") || otherTypeCheck(strNext))) || (strPrevious.equals(",") && strNext.equals(",")) || keywordPriorityCheck(strNext) == 0)))
+			} else if(strPrevious.equals(".") || (!keywordFromFlag && ((type.equals("keyword") && (strNext.equals(",") || otherTypeCheck(strNext))) || (strPrevious.equals(",") && strNext.equals(",")) || keywordPriorityCheck(strNext) == 0))) {
 				type = "columnName";
-			else if(otherTypeCheck(str))
+			} else if(otherTypeCheck(str)) {
 				type = "other";
-			else
+			} else {
 				type = "tableName";
-			
+			}
 			tokensWithType.add(new StringToken(str, type));
 		}
 		
@@ -126,7 +127,7 @@ public class Beautifier {
 		stringTokens = tokensWithType;
 	}
 	
-	public ArrayList<StringToken> deepAnalyzing(ArrayList<StringToken> tokens) { // 괄호, 콤마분석
+	public List<StringToken> deepAnalyzing(List<StringToken> tokens) { // 괄호, 콤마분석
 		String str = null;
 		String strPrevious = null;
 		String strNext = null;
@@ -170,8 +171,9 @@ public class Beautifier {
 				} else if(strStack.peek().equals("KeywordWeak")) {
 					parantheses = type + "KeywordWeak";
 					strStack.pop();
-				} else
+				} else {
 					parantheses = type;
+				}
 				tokens.set(i, new StringToken(str, parantheses));
 			}
 			if(type.equals("comma") && opfCount > 0) {
@@ -182,7 +184,7 @@ public class Beautifier {
 	}
 	
 	public void changeTokenCase() { // 대소문자 변경
-		ArrayList<StringToken> tokens = stringTokens;
+		List<StringToken> tokens = stringTokens;
 		String str = null;
 		String type = null;
 		for(int i = 0; i < tokens.size(); i++) {
@@ -195,7 +197,7 @@ public class Beautifier {
 	}
 	
 	public void insertTokenPriority() { // 토큰 우선순위 적용
-		ArrayList<StringToken> tokensWithPriority = new ArrayList<StringToken>();
+		List<StringToken> tokensWithPriority = new ArrayList<StringToken>();
 		int currentPriority = 0;
 		int priority = 0;
 		int keywordWeak = 0;
@@ -216,8 +218,9 @@ public class Beautifier {
 				if(keywordPriorityCheck(str) == 0) {
 					priority = currentPriority + keywordPriorityCheck(str);
 					indentationCheck(str);
-					if(str.toLowerCase().equals("select"))
+					if(str.toLowerCase().equals("select")) {
 						paraDepth++;
+					}
 				} else if(closingParaFlag) {
 					closingParaFlag = false;
 					keywordWeak = 0;
@@ -266,7 +269,7 @@ public class Beautifier {
 	}
 	
 	public void inlineBlock() { // 일부 문자열 조각 합치기
-		ArrayList<StringToken> inlinedTokens = new ArrayList<StringToken>();
+		List<StringToken> inlinedTokens = new ArrayList<StringToken>();
 		StringBuilder temp = new StringBuilder(""); // 버퍼역할
 		int priorityTemp = 0;
 		int paraDepthTemp = 0;
@@ -282,8 +285,9 @@ public class Beautifier {
 				temp = new StringBuilder("");
 				priorityTemp = stringTokens.get(i+1).getPriority();
 				paraDepthTemp = stringTokens.get(i+1).getParaDepth();
-			} else if(addSpaceCheck(stringTokens.get(i), stringTokens.get(i+1)))
+			} else if(addSpaceCheck(stringTokens.get(i), stringTokens.get(i+1))) {
 				temp.append(" ");
+			}
 		}
 		// index예외 방지를 위해 마지막 요소를 반복문 밖에서 처리
 		str = stringTokens.get(stringTokens.size() - 1).getString();
@@ -302,8 +306,9 @@ public class Beautifier {
 				if(betweenFlag) {
 					betweenFlag = false;
 					continue;
-				} else
+				} else {
 					stringTokens.get(i).addNewLine();
+				}
 			}
 		}
 	}
@@ -322,9 +327,8 @@ public class Beautifier {
 	
 	public String resultString() {
 		StringBuilder result = new StringBuilder("");
-		for(int i = 0; i < stringTokens.size(); i++) {
+		for(int i = 0; i < stringTokens.size(); i++)
 			result.append(stringTokens.get(i).getString());
-		}
 		return result.toString().trim();
 	}
 	
@@ -365,7 +369,7 @@ public class Beautifier {
 	}
 	
 	public boolean keywordCheck(String s) {
-		ArrayList<StringToken> keywords = keywordList();
+		List<StringToken> keywords = keywordList();
 		s = s.toLowerCase().trim();
 		for(int j = 0; j < keywords.size(); j++) {
 			if(s.equals(keywords.get(j).getString()))
@@ -375,7 +379,7 @@ public class Beautifier {
 	}
 	
 	public int keywordPriorityCheck(String s) {
-		ArrayList<StringToken> keywords = keywordList();
+		List<StringToken> keywords = keywordList();
 		s = s.toLowerCase().trim();
 		for(int i = 0; i < keywords.size(); i++) {
 			if(s.equals(keywords.get(i).getString()))
@@ -436,8 +440,8 @@ public class Beautifier {
 		else return true;
 	}
 	
-	public ArrayList<StringToken> keywordList() { // SQL 키워드 목록
-		ArrayList<StringToken> keywords = new ArrayList<StringToken>();
+	public List<StringToken> keywordList() { // SQL 키워드 목록
+		List<StringToken> keywords = new ArrayList<StringToken>();
 		int twoWordsKeywordPriority = 0;
 		if(option.getStyle() == FormatOptions.STYLE_TWO)
 			twoWordsKeywordPriority = 1;
