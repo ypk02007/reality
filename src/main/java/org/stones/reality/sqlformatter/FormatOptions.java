@@ -1,8 +1,6 @@
 package org.stones.reality.sqlformatter;
 
 public class FormatOptions {
-	private static FormatOptions instance = null;
-	
 	final static int UPPERCASE = 0; // 대소문자 관련
 	final static int LOWERCASE = 1;
 	final static int INITCAP = 2;
@@ -31,13 +29,7 @@ public class FormatOptions {
 	private int stackAlign = 0;
 	private int style = 0;
 	
-	private FormatOptions() {};
-	
-	public static FormatOptions getInstance() {
-		if(instance == null)
-			instance = new FormatOptions();
-		return instance;
-	}
+	public FormatOptions() {setDefaultOptions();}
 	
 	public void setDefaultOptions() {
 		setIndentation(4);
@@ -47,7 +39,7 @@ public class FormatOptions {
 		functionCase = INITCAP;
 		datatypeCase = UPPERCASE;
 		variableCase = LOWERCASE;
-		aliasCase = LOWERCASE;
+		aliasCase = UNCHANGED;
 		linebreakWithComma = AFTER;
 		stackAlign = ALIGN_LEFT;
 		style = STYLE_ONE;
@@ -81,7 +73,7 @@ public class FormatOptions {
 	
 	public void setKeywordCase(int code) {keywordCase = validCode(code, 3);}
 	public void setTableNameCase(int code) {tableNameCase = validCode(code, 3);}
-	public void setcolumnNameCase(int code) {columnNameCase = validCode(code, 3);}
+	public void setColumnNameCase(int code) {columnNameCase = validCode(code, 3);}
 	public void setFunctionCase(int code) {functionCase = validCode(code, 3);}
 	public void setDatatypeCase(int code) {datatypeCase = validCode(code, 3);}
 	public void setVariableCase(int code) {variableCase = validCode(code, 3);}
