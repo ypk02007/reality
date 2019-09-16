@@ -7,30 +7,30 @@ import java.util.ArrayList;
 public class ExplainPlanInfo {
 
 	private StringBuffer planDisplay;
-	private List<String> statementId = new ArrayList<String>();
-	private List<Date> timeStamp = new ArrayList<Date>();
-	private List<String> remarks = new ArrayList<String>();
-	private List<String> operation = new ArrayList<String>();
-	private List<String> options = new ArrayList<String>();
-	private List<String> objectNode = new ArrayList<String>();
-	private List<String> objectOwner = new ArrayList<String>();
-	private List<String> objectName = new ArrayList<String>();
-	private List<Integer> objectInstance = new ArrayList<Integer>();
-	private List<String> objectType = new ArrayList<String>();
-	private List<String> optimizer = new ArrayList<String>();
-	private List<Integer> searchColumns = new ArrayList<Integer>();
-	private List<Integer> id = new ArrayList<Integer>();
-	private List<Integer> parentId = new ArrayList<Integer>();
-	private List<Integer> position = new ArrayList<Integer>();
-	private List<Integer> cost = new ArrayList<Integer>();
-	private List<Integer> cardinality = new ArrayList<Integer>();
-	private List<Integer> bytes = new ArrayList<Integer>();
-	private List<String> otherTag = new ArrayList<String>();
-	private List<String> partitionStart = new ArrayList<String>();
-	private List<String> partitionStop = new ArrayList<String>();
-	private List<Integer> partitionId = new ArrayList<Integer>();
-	private List<Long> other = new ArrayList<Long>();
-	private List<String> distribution = new ArrayList<String>();
+	private String statementId;
+	private Date timeStamp;
+	private String remarks;
+	private String operation;
+	private String options;
+	private String objectNode;
+	private String objectOwner;
+	private String objectName;
+	private int objectInstance;
+	private String objectType;
+	private String optimizer;
+	private int searchColumns;
+	private int id;
+	private int parentId;
+	private int position;
+	private int cost;
+	private int cardinality;
+	private int bytes;
+	private String otherTag;
+	private String partitionStart;
+	private String partitionStop;
+	private int partitionId;
+	private Long other;
+	private String distribution;
 
 	public StringBuffer getPlanDisplay() {
 		return planDisplay;
@@ -40,197 +40,194 @@ public class ExplainPlanInfo {
 		this.planDisplay = planDisplay;
 	}
 
-	public List<String> getStatementId() {
+
+	public String getStatementId() {
 		return statementId;
 	}
 
-	public void setStatementId(List<String> statementId) {
+	public void setStatementId(String statementId) {
 		this.statementId = statementId;
 	}
 
-	public List<Date> getTimeStamp() {
+	public Date getTimeStamp() {
 		return timeStamp;
 	}
 
-	public void setTimeStamp(List<Date> timeStamp) {
+	public void setTimeStamp(Date timeStamp) {
 		this.timeStamp = timeStamp;
 	}
 
-	public List<String> getRemarks() {
+	public String getRemarks() {
 		return remarks;
 	}
 
-	public void setRemarks(List<String> remarks) {
+	public void setRemarks(String remarks) {
 		this.remarks = remarks;
 	}
 
-	public List<String> getOperation() {
+	public String getOperation() {
 		return operation;
 	}
 
-	public void setOperation(List<String> operation) {
+	public void setOperation(String operation) {
 		this.operation = operation;
 	}
 
-	public List<String> getOptions() {
+	public String getOptions() {
 		return options;
 	}
 
-	public void setOptions(List<String> options) {
+	public void setOptions(String options) {
 		this.options = options;
 	}
 
-	public List<String> getObjectNode() {
+	public String getObjectNode() {
 		return objectNode;
 	}
 
-	public void setObjectNode(List<String> objectNode) {
+	public void setObjectNode(String objectNode) {
 		this.objectNode = objectNode;
 	}
 
-	public List<String> getObjectOwner() {
+	public String getObjectOwner() {
 		return objectOwner;
 	}
 
-	public void setObjectOwner(List<String> objectOwner) {
+	public void setObjectOwner(String objectOwner) {
 		this.objectOwner = objectOwner;
 	}
 
-	public List<String> getObjectName() {
+	public String getObjectName() {
 		return objectName;
 	}
 
-	public void setObjectName(List<String> objectName) {
+	public void setObjectName(String objectName) {
 		this.objectName = objectName;
 	}
 
-	public List<Integer> getObjectInstance() {
+	public int getObjectInstance() {
 		return objectInstance;
 	}
 
-	public void setObjectInstance(List<Integer> objectInstance) {
+	public void setObjectInstance(int objectInstance) {
 		this.objectInstance = objectInstance;
 	}
 
-	public List<String> getObjectType() {
+	public String getObjectType() {
 		return objectType;
 	}
 
-	public void setObjectType(List<String> objectType) {
+	public void setObjectType(String objectType) {
 		this.objectType = objectType;
 	}
 
-	public List<String> getOptimizer() {
+	public String getOptimizer() {
 		return optimizer;
 	}
 
-	public void setOptimizer(List<String> optimizer) {
+	public void setOptimizer(String optimizer) {
 		this.optimizer = optimizer;
 	}
 
-	public List<Integer> getSearchColumns() {
+	public int getSearchColumns() {
 		return searchColumns;
 	}
 
-	public void setSearchColumns(List<Integer> searchColumns) {
+	public void setSearchColumns(int searchColumns) {
 		this.searchColumns = searchColumns;
 	}
 
-	public List<Integer> getId() {
+	public int getId() {
 		return id;
 	}
 
-	public void setId(List<Integer> id) {
+	public void setId(int id) {
 		this.id = id;
 	}
 
-	public List<Integer> getParentId() {
+	public int getParentId() {
 		return parentId;
 	}
 
-	public void setParentId(List<Integer> parentId) {
+	public void setParentId(int parentId) {
 		this.parentId = parentId;
 	}
 
-	public List<Integer> getPosition() {
+	public int getPosition() {
 		return position;
 	}
 
-	public void setPosition(List<Integer> position) {
+	public void setPosition(int position) {
 		this.position = position;
 	}
 
-	public List<Integer> getCost() {
+	public int getCost() {
 		return cost;
 	}
 
-	public void setCost(List<Integer> cost) {
+	public void setCost(int cost) {
 		this.cost = cost;
 	}
 
-	public List<Integer> getCardinality() {
+	public int getCardinality() {
 		return cardinality;
 	}
 
-	public void setCardinality(List<Integer> cardinality) {
+	public void setCardinality(int cardinality) {
 		this.cardinality = cardinality;
 	}
 
-	public List<Integer> getBytes() {
+	public int getBytes() {
 		return bytes;
 	}
 
-	public void setBytes(List<Integer> bytes) {
+	public void setBytes(int bytes) {
 		this.bytes = bytes;
 	}
 
-	public List<String> getOtherTag() {
+	public String getOtherTag() {
 		return otherTag;
 	}
 
-	public void setOtherTag(List<String> otherTag) {
+	public void setOtherTag(String otherTag) {
 		this.otherTag = otherTag;
 	}
 
-	public List<String> getPartitionStart() {
+	public String getPartitionStart() {
 		return partitionStart;
 	}
 
-	public void setPartitionStart(List<String> partitionStart) {
+	public void setPartitionStart(String partitionStart) {
 		this.partitionStart = partitionStart;
 	}
 
-	public List<String> getPartitionStop() {
+	public String getPartitionStop() {
 		return partitionStop;
 	}
 
-	public void setPartitionStop(List<String> partitionStop) {
+	public void setPartitionStop(String partitionStop) {
 		this.partitionStop = partitionStop;
 	}
 
-	public List<Integer> getPartitionId() {
+	public int getPartitionId() {
 		return partitionId;
 	}
 
-	public void setPartitionId(List<Integer> partitionId) {
+	public void setPartitionId(int partitionId) {
 		this.partitionId = partitionId;
 	}
 
-	public List<Long> getOther() {
+	public Long getOther() {
 		return other;
 	}
 
-	public void setOther(List<Long> other) {
+	public void setOther(Long other) {
 		this.other = other;
 	}
 
-	public List<String> getDistribution() {
+	public String getDistribution() {
 		return distribution;
 	}
 
-	public void setDistribution(List<String> distribution) {
-		this.distribution = distribution;
-	}
-
-
+	
 }
