@@ -4,10 +4,10 @@ public class DBModel {
 	private String username;
 	private String password;
 	private String url;
-	private String drivename;
+	private String drivername;
 	private String dbname;
 	private String host;
-	private String version;
+	private String servicename;
 	private int port;
 	
 	
@@ -16,27 +16,27 @@ public class DBModel {
 	public String getPassword() {return password;}
 	public void setPassword(String password) {this.password = password;}
 	public String getUrl() {return url;}
-	public String getDrivename() {return drivename;}
+	public String getDrivername() {return drivername;}
 	public String getDbname() {return dbname;}
 	public void setDbname(String dbname) {this.dbname = dbname;}
 	public String getHost() {return host;}
 	public void setHost(String host) {this.host = host;}
 	public int getPort() {return port;}
 	public void setPort(int port) {this.port = port;}
-	public String getVersion() {return version;}
-	public void setVersion(String version) {this.version = version;}
+	public String getServicename() {return servicename;}
+	public void setServicename(String servicename) {this.servicename = servicename;}
 	
 	
 	//url, drivename 포맷
 	public void driveurlFormat(String name) {
 		switch(name){
 			case "oracle" :
-				url = "jdbc:oracle:thin:@"+host+":"+port+":"+version;
-				drivename = "oracle.jdbc.driver.OracleDriver";
+				url = "jdbc:oracle:thin:@"+host+":"+port+":"+servicename;
+				drivername = "oracle.jdbc.driver.OracleDriver";
 				break;
 			case "postgresql" :
-				url = "jdbc:postgresql://"+host+":"+port+"/";
-				drivename = "org.postgresql.Driver";
+				url = "jdbc:postgresql://"+host+":"+port+"/"+servicename;
+				drivername = "org.postgresql.Driver";
 				break;
 			
 			default:

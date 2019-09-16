@@ -24,9 +24,22 @@ public class ConnectionTest {
 		dbModel.setPassword("user01");
 		dbModel.setUsername("user01");
 		dbModel.setPort(1521);
-		dbModel.setVersion("xe");
+		dbModel.setServicename("xe");
 		
-		Connection conn = connectionModule.connect(dbModel);
+		Connection conn = null;
+		ConResult connRe = connectionModule.connect(dbModel);
+		
+
+		boolean isConnected = connRe.isConnected();
+		
+		if(isConnected) {
+			conn = connRe.getConn();
+			System.out.println(connRe.getMsg());
+		}else {
+			
+			System.out.println(connRe.getMsg());
+			return;
+		}
 		
 		try {
 			Statement st = conn.createStatement();
@@ -55,7 +68,17 @@ public class ConnectionTest {
 		dbModel.setUsername("postgres");
 		dbModel.setPort(5439);
 		
-		Connection conn = connectionModule.connect(dbModel);
+		ConResult connRe = connectionModule.connect(dbModel);
+		
+		Connection conn = connRe.getConn();
+		boolean isConnected = connRe.isConnected();
+		String msg = connRe.getMsg();
+		
+		if(isConnected) {
+			
+		}else {
+			
+		}
 		
 	}
 }
