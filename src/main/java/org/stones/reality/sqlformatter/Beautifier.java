@@ -72,17 +72,14 @@ public class Beautifier {
 	public void insertTokenType() { // 토큰의 특성 적용
 		List<StringToken> tokensWithType = new ArrayList<StringToken>();
 		String str = null;
-		String strPrevious = null;
+		String strPrevious = "";
 		String strNext = null;
 		String type = null;
 		boolean keywordFromFlag = false;
 		stringTokens.add(new StringToken(" ")); // 원활한 반복문 작업을 위해 공백 추가
-		
-		tokensWithType.add(new StringToken(stringTokens.get(0).getString(), "keyword")); // 첫 토큰은 반드시 키워드
-		
-		for(int i = 1; i < stringTokens.size() - 1; i++) {
+
+		for(int i = 0; i < stringTokens.size() - 1; i++) {
 			str = stringTokens.get(i).getString();
-			strPrevious = stringTokens.get(i-1).getString();
 			strNext = stringTokens.get(i+1).getString();
 			
 			if(str.charAt(0) == '\'' && str.charAt(str.length()-1) == '\'') {
@@ -120,6 +117,7 @@ public class Beautifier {
 				type = "tableName";
 			}
 			tokensWithType.add(new StringToken(str, type));
+			strPrevious = str;
 		}
 		
 		tokensWithType = deepAnalyzing(tokensWithType);
@@ -129,31 +127,28 @@ public class Beautifier {
 	
 	public List<StringToken> deepAnalyzing(List<StringToken> tokens) { // 괄호, 콤마분석
 		String str = null;
-		String strPrevious = null;
+		String strPrevious = "";
 		String strNext = null;
 		String type = null;
-		String previous = null;
-		String next = null;
+		String typePrevious = "";
+		String typeNext = null;
 		String parantheses = null;
 		int opfCount = 0;
 		Stack<String> strStack = new Stack<String>();
-		tokens.add(new StringToken(" ", "other"));
-		for(int i = 1; i < tokens.size() - 1; i++) {
+		for(int i = 0; i < tokens.size() - 1; i++) {
 			str = tokens.get(i).getString();
-			strPrevious = tokens.get(i-1).getString();
 			strNext = tokens.get(i+1).getString();
 			type = tokens.get(i).getType();
-			previous = tokens.get(i-1).getType();
-			next = tokens.get(i+1).getType();
+			typeNext = tokens.get(i+1).getType();
 			if(type.equals("openingParantheses")) {
-				if(previous.equals("function")) {
+				if(typePrevious.equals("function")) {
 					parantheses = type + "Function";
 					strStack.push("Function");
 					opfCount++;
-				} else if(next.equals("keyword") && keywordPriorityCheck(strNext) == 0) {
+				} else if(typeNext.equals("keyword") && keywordPriorityCheck(strNext) == 0) {
 					parantheses = type + "KeywordStrong";
 					strStack.push("KeywordStrong");
-				} else if(previous.equals("keyword") && keywordPriorityCheck(strPrevious) == 1) {
+				} else if(typePrevious.equals("keyword") && keywordPriorityCheck(strPrevious) == 1) {
 					parantheses = type + "KeywordWeak";
 					strStack.push("KeywordWeak");
 				} else
@@ -176,9 +171,11 @@ public class Beautifier {
 				}
 				tokens.set(i, new StringToken(str, parantheses));
 			}
-			if(type.equals("comma") && opfCount > 0) {
+			if(type.equals("comma") && opfCount > 0) { // 파라미터 콤마 구분
 				tokens.set(i, new StringToken(str, type + "Function"));
 			}
+			strPrevious = str;
+			typePrevious = type;
 		}
 		return tokens;
 	}
