@@ -135,6 +135,7 @@ public class Beautifier {
 		String parantheses = null;
 		int opfCount = 0;
 		Stack<String> strStack = new Stack<String>();
+
 		for(int i = 0; i < tokens.size() - 1; i++) {
 			str = tokens.get(i).getString();
 			strNext = tokens.get(i+1).getString();
