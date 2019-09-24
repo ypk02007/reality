@@ -453,6 +453,8 @@ public class Beautifier {
 		keywords.add(new StringToken("by", twoWordsKeywordPriority));
 		keywords.add(new StringToken("and", 1));
 		keywords.add(new StringToken("or", 1));
+		keywords.add(new StringToken("not", 1));
+		keywords.add(new StringToken("in", 1));
 		keywords.add(new StringToken("between", 1));
 		keywords.add(new StringToken("desc", 1));
 		keywords.add(new StringToken("as", 1));
