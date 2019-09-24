@@ -32,13 +32,6 @@ public class Main {
 				"abs(obj.psfMag_r - nobj.psfMag_r) < 0.5 or \r\n" + 
 				"abs(obj.psfMag_i - nobj.psfMag_i) < 0.5) \r\n" + 
 				"order by obj.run, obj.camCol, obj.field;";
-		String sql3 = "(select c_name from deposit \r\n" + 
-				"where c_name not in (select c_name \r\n" + 
-				"from loan)) \r\n" + 
-				"union \r\n" + 
-				"(select c_name from loan \r\n" + 
-				"where c_name not in (select c_name \r\n" + 
-				"from deposit));";
 		
 		String result = "";
 		
@@ -50,8 +43,8 @@ public class Main {
 		System.out.println(result);
 		System.out.println("\n=======================================\n");
 		bf2.getBeautifierOption().setStyle(FormatOptions.STYLE_TWO);
-		//bf2.getBeautifierOption().setStackAlign(FormatOptions.ALIGN_RIGHT);
-		result = bf2.beautifier(sql3);
+		bf2.getBeautifierOption().setStackAlign(FormatOptions.ALIGN_RIGHT);
+		result = bf2.beautifier(sql2);
 		System.out.println(result);
 	}
 }

@@ -202,10 +202,8 @@ public class Beautifier {
 		boolean newLineKeywordFlag = false;
 		boolean closingParaFlag = false;
 		String str = null;
+		String typePrevious = "";
 		String type = null;
-		
-		//indentationCheck(stringTokens.get(0).getString());
-		//tokensWithPriority.add(new StringToken(stringTokens.get(0).getString(), priority)); // 첫 토큰은 반드시 priority가 0
 		
 		for(int i = 0; i < stringTokens.size(); i++) {
 			str = stringTokens.get(i).getString();
@@ -215,7 +213,7 @@ public class Beautifier {
 				if(keywordPriorityCheck(str) == 0) {
 					priority = currentPriority + keywordPriorityCheck(str);
 					indentationCheck(str);
-					if(str.toLowerCase().equals("select")) {
+					if(typePrevious.equals("openingParanthesesKeywordStrong") && str.toLowerCase().equals("select")) {
 						paraDepth++;
 					}
 				} else if(closingParaFlag) {
@@ -255,6 +253,8 @@ public class Beautifier {
 			}
 			tokensWithPriority.add(new StringToken(str, type, priority));
 			tokensWithPriority.get(i).setParaDepth(paraDepth);
+			
+			typePrevious = type;
 		}
 		
 		for(int i = 0; i < tokensWithPriority.size(); i++) { // 형식 맞추기 위한 스페이스 추가
@@ -297,12 +297,12 @@ public class Beautifier {
 	public void insertNewLine() { // 개행문자 추가
 		boolean betweenFlag = false;
 		for(int i = 0; i < stringTokens.size() - 1; i++) { // 마지막 문자열 조각은 개행문자가 필요없음
-			if(stringTokens.get(i).getString().toLowerCase().equals("between")) { // BETWEEN A AND B
+			if(stringTokens.get(i).getString().toLowerCase().equals("between"))
 				betweenFlag = true;
-			}
-			if(newLineCheck(stringTokens.get(i), stringTokens.get(i+1))) {
+			if(newLineCheck(stringTokens.get(i), stringTokens.get(i+1))) { // BETWEEN A AND B
 				if(betweenFlag) {
 					betweenFlag = false;
+					continue;
 				} else {
 					stringTokens.get(i).addNewLine();
 				}
@@ -391,9 +391,7 @@ public class Beautifier {
 	}
 	
 	public boolean newLineCheck(StringToken current, StringToken next) { // 개행조건 체크
-		// UNION 키워드
-		if(current.getString().toLowerCase().trim().equals("union")) return true;
-		// 다음 토큰과 우선순위가 다른 경우  & style one 옵션
+		// 다음 토큰과 우선순위가 다른 경우 & style one 옵션
 		if((current.getPriority() != next.getPriority()) && (option.getStyle() == FormatOptions.STYLE_ONE)) return true;
 		// 다음 토큰이 우선도 0인 keyword면서 이번 토큰이 여는 괄호가 아닌 경우 & style two 옵션
 		if((keywordPriorityCheck(next.getString()) == 0) && !current.getString().equals("(") && (option.getStyle() == FormatOptions.STYLE_TWO)) return true;
@@ -455,8 +453,6 @@ public class Beautifier {
 		keywords.add(new StringToken("by", twoWordsKeywordPriority));
 		keywords.add(new StringToken("and", 1));
 		keywords.add(new StringToken("or", 1));
-		keywords.add(new StringToken("not", 1));
-		keywords.add(new StringToken("in", 1));
 		keywords.add(new StringToken("between", 1));
 		keywords.add(new StringToken("desc", 1));
 		keywords.add(new StringToken("as", 1));
