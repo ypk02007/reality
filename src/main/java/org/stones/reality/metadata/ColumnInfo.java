@@ -31,6 +31,4 @@ public class ColumnInfo {
 	public void setColumnName(String columnName) {
 		this.columnName = columnName;
 	}
-	
-	
 }
